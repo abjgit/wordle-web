@@ -29,9 +29,9 @@ export default async function handler(
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Verificar la firma
+    // Verificar la firma usando ethers.utils.verifyMessage
     const message = payload;
-    const recoveredAddress = ethers.verifyMessage(message, signature);
+    const recoveredAddress = ethers.utils.verifyMessage(message, signature);
 
     if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
       return res.status(401).json({ error: 'Invalid signature' });

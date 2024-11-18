@@ -9,10 +9,10 @@ export const APP_CONFIG = {
   name: 'Wordle Web',
   description: 'A Web3-enabled Wordle game',
   domain: process.env.NODE_ENV === 'production' 
-    ? 'wordle-web-de916.vercel.app'
+    ? 'wordle-f398zs3g7-abjgits-projects.vercel.app'
     : 'localhost:5173',
   url: process.env.NODE_ENV === 'production'
-    ? 'https://wordle-web-de916.vercel.app'
+    ? 'https://wordle-f398zs3g7-abjgits-projects.vercel.app'
     : 'http://localhost:5173',
 };
 

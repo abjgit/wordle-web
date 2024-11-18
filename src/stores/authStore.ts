@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { AuthState, User } from '@/types';
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ConnectWallet, useAddress } from '@thirdweb-dev/react';
+import { signInWithCustomToken } from 'firebase/auth';
 
 interface AuthStore extends AuthState {
   login: (walletAddress: string) => Promise<void>;
@@ -19,52 +19,44 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   login: async (walletAddress: string) => {
     set({ isLoading: true, error: null });
     try {
-      const userDoc = await getDoc(doc(db, 'users', walletAddress));
-      
+      // Verificar si el usuario existe en Firestore
+      const userRef = doc(db, 'users', walletAddress);
+      const userDoc = await getDoc(userRef);
+
+      let userData: User;
+
       if (userDoc.exists()) {
-        set({ user: userDoc.data() as User });
+        userData = userDoc.data() as User;
       } else {
-        const newUser: User = {
+        // Crear nuevo usuario si no existe
+        userData = {
           id: walletAddress,
-          walletAddress,
-          tier: 'BEGINNER',
-          points: 0,
+          address: walletAddress,
           gamesPlayed: 0,
-          attemptsToday: 0,
+          gamesWon: 0,
+          currentStreak: 0,
+          bestStreak: 0,
+          totalPoints: 0,
+          createdAt: new Date().toISOString(),
         };
-        await setDoc(doc(db, 'users', walletAddress), newUser);
-        set({ user: newUser });
+        await setDoc(userRef, userData);
       }
+
+      set({ user: userData, isLoading: false });
     } catch (error) {
-      set({ error: (error as Error).message });
-    } finally {
-      set({ isLoading: false });
+      console.error('Error logging in with wallet:', error);
+      set({ error: 'Failed to login with wallet', isLoading: false });
     }
   },
 
   loginWithEmail: async (email: string) => {
     set({ isLoading: true, error: null });
     try {
-      const userDoc = await getDoc(doc(db, 'users', email));
-      
-      if (userDoc.exists()) {
-        set({ user: userDoc.data() as User });
-      } else {
-        const newUser: User = {
-          id: email,
-          email,
-          tier: 'BEGINNER',
-          points: 0,
-          gamesPlayed: 0,
-          attemptsToday: 0,
-        };
-        await setDoc(doc(db, 'users', email), newUser);
-        set({ user: newUser });
-      }
-    } catch (error) {
-      set({ error: (error as Error).message });
-    } finally {
+      // Implementar lógica de login con email si es necesario
       set({ isLoading: false });
+    } catch (error) {
+      console.error('Error logging in with email:', error);
+      set({ error: 'Failed to login with email', isLoading: false });
     }
   },
 
@@ -72,11 +64,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await auth.signOut();
-      set({ user: null });
+      set({ user: null, isLoading: false });
     } catch (error) {
-      set({ error: (error as Error).message });
-    } finally {
-      set({ isLoading: false });
+      console.error('Error logging out:', error);
+      set({ error: 'Failed to logout', isLoading: false });
     }
   },
 
@@ -84,14 +75,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const { user } = get();
     if (!user) return;
 
-    set({ isLoading: true, error: null });
     try {
-      await setDoc(doc(db, 'users', user.id), { ...user, ...data }, { merge: true });
-      set({ user: { ...user, ...data } });
+      const updatedUser = { ...user, ...data };
+      await setDoc(doc(db, 'users', user.id), updatedUser);
+      set({ user: updatedUser });
     } catch (error) {
-      set({ error: (error as Error).message });
-    } finally {
-      set({ isLoading: false });
+      console.error('Error updating user:', error);
+      set({ error: 'Failed to update user' });
     }
   },
 }));

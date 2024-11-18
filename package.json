@@ -12,10 +12,12 @@
   "dependencies": {
     "@thirdweb-dev/react": "^4.1.10",
     "@thirdweb-dev/sdk": "^4.0.17",
+    "@vercel/node": "^3.2.24",
     "axios": "^1.6.2",
     "buffer": "^6.0.3",
     "ethers": "^5.7.2",
-    "firebase": "^10.6.0",
+    "firebase": "^10.14.1",
+    "firebase-admin": "^13.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",

@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ConnectWallet } from '@thirdweb-dev/react';
+import { ConnectWallet, useAddress, useSDK } from '@thirdweb-dev/react';
 import { useAuthStore } from '@/stores/authStore';
+import { signInWithCustomToken, auth } from 'firebase/auth';
 
 const Container = styled.div`
   display: flex;
@@ -29,10 +30,9 @@ const Button = styled.button`
   color: white;
   border: none;
   border-radius: 4px;
-  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-
+  font-size: 16px;
+  
   &:hover {
     background-color: #538d4e;
   }
@@ -40,11 +40,55 @@ const Button = styled.button`
 
 const AuthButtons: React.FC = () => {
   const [email, setEmail] = React.useState('');
-  const { loginWithEmail, error } = useAuthStore();
+  const { loginWithEmail, login, error } = useAuthStore();
+  const address = useAddress();
+  const sdk = useSDK();
 
   const handleEmailLogin = async () => {
     if (email) {
       await loginWithEmail(email);
+    }
+  };
+
+  const handleWalletConnect = async () => {
+    if (address) {
+      try {
+        // Get the currently connected wallet's address
+        const payload = {
+          address: address,
+          chainId: await sdk?.getChainId(),
+        };
+
+        // Sign the payload with the wallet
+        const signedPayload = await sdk?.wallet.sign(JSON.stringify(payload));
+        
+        // Call our backend to verify the signature and get a Firebase token
+        const response = await fetch('/api/auth/metamask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            address,
+            signature: signedPayload,
+            payload: JSON.stringify(payload),
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to authenticate');
+        }
+
+        const { token } = await response.json();
+
+        // Sign in to Firebase with the custom token
+        await signInWithCustomToken(auth, token);
+        
+        // Login with the wallet address
+        await login(address);
+      } catch (error) {
+        console.error('Error connecting wallet:', error);
+      }
     }
   };
 
@@ -60,6 +104,7 @@ const AuthButtons: React.FC = () => {
           subtitle: "Connect your wallet to start playing",
         }}
         modalTitleIconUrl="/wordle-icon.png"
+        onConnect={handleWalletConnect}
       />
       
       <EmailContainer>

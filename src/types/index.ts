@@ -2,13 +2,14 @@ export type GameTier = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 export interface User {
   id: string;
-  walletAddress?: string;
+  address: string;
   email?: string;
-  tier: GameTier;
-  points: number;
   gamesPlayed: number;
-  attemptsToday: number;
-  lastPlayed?: Date;
+  gamesWon: number;
+  currentStreak: number;
+  bestStreak: number;
+  totalPoints: number;
+  createdAt: string;
 }
 
 export interface GameState {
@@ -44,8 +45,9 @@ export interface GameStore {
 
 export interface LeaderboardEntry {
   userId: string;
-  username: string;
-  points: number;
-  tier: GameTier;
+  address: string;
+  totalPoints: number;
   gamesWon: number;
+  currentStreak: number;
+  bestStreak: number;
 }

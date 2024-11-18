@@ -1,76 +1,69 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { LetterStatus } from '@/types';
+
+const KEYBOARD_ROWS = [
+  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+  ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE']
+];
 
 interface KeyboardProps {
-  onKeyPress: (key: string) => void;
+  onKeyPress?: (key: string) => void;
 }
 
-const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress }) => {
-  const { gameState } = useGameStore();
-  
-  const getKeyStatus = (key: string) => {
-    if (!gameState?.statuses) return '';
-    const flatStatuses = gameState.statuses.flat();
-    const keyIndices = gameState.attempts
-      .join('')
-      .split('')
-      .map((letter, index) => letter === key ? index : -1)
-      .filter(index => index !== -1);
+export const Keyboard: React.FC<KeyboardProps> = () => {
+  const { gameState, makeGuess, setCurrentGuess } = useGameStore();
+
+  const getKeyStatus = (key: string): LetterStatus => {
+    const { statuses, guesses } = gameState;
+    const flatStatuses = statuses.flat();
+    const flatGuesses = guesses.join('').toUpperCase();
+    const keyIndex = flatGuesses.lastIndexOf(key);
     
-    if (keyIndices.length === 0) return '';
-    
-    const statuses = keyIndices.map(index => flatStatuses[index]);
-    if (statuses.includes('🟩')) return '🟩';
-    if (statuses.includes('🟨')) return '🟨';
-    if (statuses.includes('⬜')) return '⬜';
-    return '';
+    if (keyIndex === -1) return 'unused';
+    return flatStatuses[keyIndex];
   };
 
-  const getKeyClasses = (key: string, isWide = false) => {
-    const status = getKeyStatus(key);
-    let classes = 'keyboard-key font-bold text-sm sm:text-base transition-colors duration-150 ';
-    classes += isWide ? 'min-w-[65px] px-2 ' : 'min-w-[40px] ';
-    
-    switch (status) {
-      case '🟩':
-        classes += 'bg-correct text-white';
-        break;
-      case '🟨':
-        classes += 'bg-present text-white';
-        break;
-      case '⬜':
-        classes += 'bg-absent text-white';
-        break;
-      default:
-        classes += 'bg-key-bg text-gray-900 hover:bg-gray-300';
+  const handleKeyClick = (key: string) => {
+    if (gameState.isFinished) return;
+
+    if (key === 'BACKSPACE') {
+      setCurrentGuess(gameState.currentGuess.slice(0, -1));
+    } else if (key === 'ENTER') {
+      if (gameState.currentGuess.length === 5) {
+        makeGuess(gameState.currentGuess);
+      }
+    } else if (gameState.currentGuess.length < 5) {
+      setCurrentGuess(gameState.currentGuess + key);
     }
-    
-    return classes;
   };
-
-  const rows = [
-    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE']
-  ];
 
   return (
     <div className="flex flex-col items-center gap-2 mt-8">
-      {rows.map((row, i) => (
-        <div key={i} className="flex gap-1.5">
-          {row.map((key) => (
-            <button
-              key={key}
-              onClick={() => onKeyPress(key)}
-              className={getKeyClasses(key, key === 'ENTER' || key === 'BACKSPACE')}
-            >
-              {key === 'BACKSPACE' ? '⌫' : key}
-            </button>
-          ))}
+      {KEYBOARD_ROWS.map((row, rowIndex) => (
+        <div key={rowIndex} className="flex gap-1.5">
+          {row.map((key) => {
+            const status = getKeyStatus(key);
+            return (
+              <button
+                key={key}
+                onClick={() => handleKeyClick(key)}
+                className={`
+                  font-bold text-sm sm:text-base transition-colors duration-150 
+                  ${status === 'correct' ? 'bg-correct text-white' :
+                    status === 'present' ? 'bg-present text-white' :
+                    status === 'absent' ? 'bg-absent text-white' :
+                    'bg-key-bg text-gray-900 hover:bg-gray-300'}
+                  ${key === 'ENTER' || key === 'BACKSPACE' ? 'min-w-[65px] px-2' : 'min-w-[40px]'}
+                `}
+              >
+                {key === 'BACKSPACE' ? '⌫' : key}
+              </button>
+            );
+          })}
         </div>
       ))}
     </div>
   );
 };
-
-export default Keyboard;

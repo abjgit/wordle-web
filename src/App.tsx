@@ -1,8 +1,8 @@
 import React from 'react';
 import { ThirdwebProvider } from "@thirdweb-dev/react";
 import { useAuthStore } from './stores/authStore';
-import AuthButtons from './components/AuthButtons';
-import GameContainer from './components/GameContainer';
+import { AuthButtons } from './components/AuthButtons';
+import { GameContainer } from './components/GameContainer';
 import { THIRDWEB_CONFIG } from './config';
 
 const App: React.FC = () => {
@@ -20,7 +20,7 @@ const App: React.FC = () => {
             <div className="text-xl">Loading...</div>
           </div>
         ) : !user ? (
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center">
             <AuthButtons />
           </div>
         ) : (

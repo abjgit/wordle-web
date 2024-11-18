@@ -1,9 +1,12 @@
 import { TierConfig } from '@/types';
 
-export const WORD_LENGTH = 5;
-export const MAX_ATTEMPTS = 6;
-export const BASE_POINTS = 100;
-export const BONUS_POINTS_PER_REMAINING_TRY = 50;
+export const GAME_CONFIG = {
+  MAX_ATTEMPTS: 6,
+  WORD_LENGTH: 5,
+  BASE_POINTS: 100,
+  STREAK_MULTIPLIER: 0.1,  // 10% extra por cada juego en racha
+  ATTEMPTS_MULTIPLIER: 20,  // 20 puntos extra por cada intento restante
+};
 
 export const TIERS: Record<string, TierConfig> = {
   BEGINNER: {

@@ -1,32 +1,28 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithCustomToken } from 'firebase/auth';
+import { ThirdwebSDK } from '@thirdweb-dev/sdk';
+import { auth } from '@/lib/firebase';
+import { signInWithCustomToken } from 'firebase/auth';
 import { ConnectWallet, useAddress, useSDK } from "@thirdweb-dev/react";
-import { FIREBASE_CONFIG } from '../config';
-
-// Initialize Firebase
-const app = initializeApp(FIREBASE_CONFIG);
-const auth = getAuth(app);
 
 export const useMetaMaskAuth = () => {
   const address = useAddress();
   const sdk = useSDK();
 
-  const signInWithMetaMask = async () => {
-    try {
-      if (!address) {
-        throw new Error("No wallet connected");
-      }
+  const authenticateWithWallet = async (address: string, sdk: ThirdwebSDK | undefined) => {
+    if (!sdk) {
+      throw new Error('ThirdWeb SDK not initialized');
+    }
 
-      // Get the currently connected wallet's address
+    try {
+      // Crear el payload para firmar
       const payload = {
-        address: address,
-        chainId: await sdk?.getChainId(),
+        address,
+        timestamp: Date.now(),
       };
 
-      // Sign the payload with the wallet
-      const signedPayload = await sdk?.wallet.sign(JSON.stringify(payload));
-      
-      // Call your backend to verify the signature and get a Firebase custom token
+      // Firmar el payload con la wallet
+      const signedPayload = await sdk.wallet.sign(JSON.stringify(payload));
+
+      // Llamar al endpoint de autenticación
       const response = await fetch('/api/auth/metamask', {
         method: 'POST',
         headers: {
@@ -45,10 +41,23 @@ export const useMetaMaskAuth = () => {
 
       const { token } = await response.json();
 
-      // Sign in to Firebase with the custom token
+      // Iniciar sesión en Firebase con el token personalizado
       await signInWithCustomToken(auth, token);
 
       return true;
+    } catch (error) {
+      console.error('Error in wallet authentication:', error);
+      throw error;
+    }
+  };
+
+  const signInWithMetaMask = async () => {
+    try {
+      if (!address) {
+        throw new Error("No wallet connected");
+      }
+
+      return await authenticateWithWallet(address, sdk);
     } catch (error) {
       console.error('Error signing in with MetaMask:', error);
       throw error;

@@ -4,8 +4,9 @@ export interface GameState {
   word: string;
   guesses: string[];
   currentGuess: string;
-  statuses: LetterStatus[][];
-  isFinished: boolean;
+  gameStatus: 'playing' | 'won' | 'lost';
+  letterStatuses: Record<string, LetterStatus>;
+  currentRow: number;
 }
 
 export interface User {
@@ -17,7 +18,7 @@ export interface User {
   currentStreak: number;
   maxStreak: number;
   lastPlayedAt: Date | null;
-  [key: string]: string | number | Date | null;
+  [key: string]: string | number | Date | null | undefined;
 }
 
 export interface KeyboardState {

@@ -19,10 +19,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   error: null,
 
   signIn: async () => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true });
     try {
-      // La lógica de signIn se maneja en el componente AuthButtons
-      // usando ThirdWeb ConnectWallet
       set({ isLoading: false });
     } catch (error) {
       set({ error: 'Failed to sign in', isLoading: false });
@@ -30,7 +28,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   signOut: async () => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true });
     try {
       await auth.signOut();
       set({ user: null, isLoading: false });

@@ -6,24 +6,7 @@ export const GAME_CONFIG = {
   BASE_POINTS: 100,
   STREAK_MULTIPLIER: 0.1,  // 10% extra por cada juego en racha
   ATTEMPTS_MULTIPLIER: 20,  // 20 puntos extra por cada intento restante
-};
-
-export const TIERS: Record<string, TierConfig> = {
-  BEGINNER: {
-    dailyAttempts: 1,
-    pointsMultiplier: 1,
-  },
-  INTERMEDIATE: {
-    dailyAttempts: 2,
-    pointsMultiplier: 1.5,
-    requiredPoints: 1000,
-  },
-  ADVANCED: {
-    dailyAttempts: 3,
-    pointsMultiplier: 2,
-    requiredPoints: 2500,
-  },
-};
+} as const;
 
 export const FIREBASE_CONFIG = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,

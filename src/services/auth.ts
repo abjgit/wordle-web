@@ -1,7 +1,7 @@
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 import { auth } from '@/lib/firebase';
 import { signInWithCustomToken } from 'firebase/auth';
-import { ConnectWallet, useAddress, useSDK } from "@thirdweb-dev/react";
+import { useAddress, useSDK } from "@thirdweb-dev/react";
 
 export const useMetaMaskAuth = () => {
   const address = useAddress();

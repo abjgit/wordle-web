@@ -1,5 +1,5 @@
-import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { LetterStatus } from '@/types';
 
 export const GameBoard = () => {
   const { gameState } = useGameStore();
@@ -20,7 +20,7 @@ export const GameBoard = () => {
       {guessRows.map((guess, i) => (
         <div key={i} className="grid grid-cols-5 gap-1">
           {guess.split('').map((letter: string, j: number) => {
-            let status = 'unused';
+            let status: LetterStatus = 'unused';
             if (i < guesses.length && gameState.statuses[i]) {
               status = gameState.statuses[i][j];
             }
@@ -45,5 +45,3 @@ export const GameBoard = () => {
     </div>
   );
 };
-
-export { GameBoard };

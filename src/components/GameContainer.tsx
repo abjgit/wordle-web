@@ -1,4 +1,3 @@
-import React from 'react';
 import { GameBoard } from './GameBoard';
 import { Keyboard } from './Keyboard';
 import { useGameStore } from '@/stores/gameStore';

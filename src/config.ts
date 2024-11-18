@@ -4,6 +4,18 @@ export const MAX_ATTEMPTS = 6;
 export const BASE_POINTS = 100;
 export const BONUS_POINTS_PER_REMAINING_TRY = 20;
 
+// App configuration
+export const APP_CONFIG = {
+  name: 'Wordle Web',
+  description: 'A Web3-enabled Wordle game',
+  domain: process.env.NODE_ENV === 'production' 
+    ? 'wordle-web-de916.vercel.app'
+    : 'localhost:5173',
+  url: process.env.NODE_ENV === 'production'
+    ? 'https://wordle-web-de916.vercel.app'
+    : 'http://localhost:5173',
+};
+
 // Firebase configuration
 export const FIREBASE_CONFIG = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,

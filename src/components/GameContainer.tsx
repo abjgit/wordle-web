@@ -48,7 +48,10 @@ const GameContainer: React.FC = () => {
       <div className="flex justify-between items-center w-full mb-5">
         <div className="flex flex-col">
           <h2 className="text-lg font-medium text-gray-900">Welcome, {user.email || user.walletAddress}</h2>
-          <p className="text-sm text-gray-600">Points: {user.points}</p>
+          <div className="flex justify-between items-center mb-4">
+            <div>Address: {user.address}</div>
+            <div>Points: {user.totalPoints}</div>
+          </div>
         </div>
         <button
           onClick={logout}

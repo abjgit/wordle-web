@@ -2,7 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { ConnectWallet, useAddress, useSDK } from '@thirdweb-dev/react';
 import { useAuthStore } from '@/stores/authStore';
-import { signInWithCustomToken, auth } from 'firebase/auth';
+import { getAuth, signInWithCustomToken } from 'firebase/auth';
+import { app } from '@/lib/firebase';
+
+const auth = getAuth(app);
 
 const Container = styled.div`
   display: flex;
@@ -51,16 +54,16 @@ const AuthButtons: React.FC = () => {
   };
 
   const handleWalletConnect = async () => {
-    if (address) {
+    if (address && sdk) {
       try {
         // Get the currently connected wallet's address
         const payload = {
           address: address,
-          chainId: await sdk?.getChainId(),
+          chainId: await sdk.wallet.getChainId(),
         };
 
         // Sign the payload with the wallet
-        const signedPayload = await sdk?.wallet.sign(JSON.stringify(payload));
+        const signedPayload = await sdk.wallet.sign(JSON.stringify(payload));
         
         // Call our backend to verify the signature and get a Firebase token
         const response = await fetch('/api/auth/metamask', {

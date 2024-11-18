@@ -1,153 +1,105 @@
 import { create } from 'zustand';
-import { GameState, GameStore } from '@/types';
+import { User } from '@/types';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { WORD_LENGTH, MAX_ATTEMPTS, BASE_POINTS, BONUS_POINTS_PER_REMAINING_TRY, TIERS } from '@/config';
 import { useAuthStore } from './authStore';
 
-// Lista de palabras de prueba para desarrollo
-const TEST_WORDS = ['HOUSE', 'LIGHT', 'BRAIN', 'PHONE', 'WATER'];
+interface GameStore {
+  word: string | null;
+  guesses: string[];
+  currentGuess: string;
+  gameStatus: 'playing' | 'won' | 'lost';
+  error: string | null;
+  isLoading: boolean;
+  makeGuess: (guess: string) => Promise<void>;
+  setCurrentGuess: (guess: string) => void;
+  initGame: () => Promise<void>;
+  resetGame: () => void;
+}
 
-const calculatePoints = (attempts: number, tier: string): number => {
-  if (attempts >= MAX_ATTEMPTS) return 0;
-  
-  const remainingTries = MAX_ATTEMPTS - attempts;
-  const base = BASE_POINTS;
-  const bonus = remainingTries * BONUS_POINTS_PER_REMAINING_TRY;
-  const multiplier = TIERS[tier].pointsMultiplier;
-  
-  return Math.floor((base + bonus) * multiplier);
-};
-
-const checkGuess = (guess: string, word: string): string[] => {
-  const result: string[] = Array(WORD_LENGTH).fill('');
-  const wordArray = word.split('');
-  const guessArray = guess.split('');
-
-  // First pass: check for correct positions
-  for (let i = 0; i < WORD_LENGTH; i++) {
-    if (guessArray[i] === wordArray[i]) {
-      result[i] = 'correct';
-      wordArray[i] = '*';
-      guessArray[i] = '*';
-    }
-  }
-
-  // Second pass: check for correct letters in wrong positions
-  for (let i = 0; i < WORD_LENGTH; i++) {
-    if (guessArray[i] !== '*') {
-      const index = wordArray.indexOf(guessArray[i]);
-      if (index !== -1) {
-        result[i] = 'present';
-        wordArray[index] = '*';
-      } else if (result[i] === '') {
-        result[i] = 'absent';
-      }
-    }
-  }
-
-  return result;
+const POINTS_CONFIG = {
+  BASE_POINTS: 100,
+  STREAK_MULTIPLIER: 0.1,  // 10% extra por cada juego en racha
+  ATTEMPTS_MULTIPLIER: 20,  // 20 puntos extra por cada intento restante
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
-  gameState: null,
-  isLoading: false,
+  word: null,
+  guesses: [],
+  currentGuess: '',
+  gameStatus: 'playing',
   error: null,
+  isLoading: false,
 
   initGame: async () => {
     set({ isLoading: true, error: null });
     try {
-      const today = new Date().toISOString().split('T')[0];
-      const wordDoc = await getDoc(doc(db, 'dailyWords', today));
-      
-      let word;
-      if (!wordDoc.exists()) {
-        // Si no hay palabra para hoy, usar una palabra de prueba
-        const randomIndex = Math.floor(Math.random() * TEST_WORDS.length);
-        word = TEST_WORDS[randomIndex];
-        
-        // Guardar la palabra en Firestore
-        await setDoc(doc(db, 'dailyWords', today), { word });
-      } else {
-        word = wordDoc.data().word;
-      }
-
-      set({
-        gameState: {
-          word,
-          currentGuess: '',
-          guesses: Array(MAX_ATTEMPTS).fill(''),
-          statuses: Array(MAX_ATTEMPTS).fill(Array(WORD_LENGTH).fill('')),
-          attempts: [],
-          isFinished: false,
-          won: false,
-        },
-        isLoading: false,
-      });
+      // Aquí iría la lógica para obtener una nueva palabra
+      set({ word: 'WORLD', isLoading: false });
     } catch (error) {
-      console.error('Error initializing game:', error);
-      // En caso de error, usar una palabra de prueba
-      const randomIndex = Math.floor(Math.random() * TEST_WORDS.length);
-      const word = TEST_WORDS[randomIndex];
-      
-      set({
-        gameState: {
-          word,
-          currentGuess: '',
-          guesses: Array(MAX_ATTEMPTS).fill(''),
-          statuses: Array(MAX_ATTEMPTS).fill(Array(WORD_LENGTH).fill('')),
-          attempts: [],
-          isFinished: false,
-          won: false,
-        },
-        isLoading: false,
-        error: null,
-      });
+      set({ error: 'Failed to start game', isLoading: false });
     }
   },
 
   makeGuess: async (guess: string) => {
-    const { gameState } = get();
-    if (!gameState || gameState.isFinished || guess.length !== WORD_LENGTH) return;
+    const { word, guesses } = get();
+    const { user } = useAuthStore.getState();
 
-    const newGuesses = [...gameState.guesses];
-    const newStatuses = [...gameState.statuses];
-    const currentAttempt = gameState.attempts.length;
+    if (!word || !user) return;
 
-    newGuesses[currentAttempt] = guess;
-    newStatuses[currentAttempt] = checkGuess(guess, gameState.word);
-
-    const isWon = guess === gameState.word;
-    const isFinished = isWon || currentAttempt + 1 >= MAX_ATTEMPTS;
-
-    set({
-      gameState: {
-        ...gameState,
-        guesses: newGuesses,
-        statuses: newStatuses,
-        attempts: [...gameState.attempts, guess],
-        currentGuess: '',
-        isFinished,
-        won: isWon,
-      },
-    });
-
-    if (isFinished) {
-      const { user } = useAuthStore.getState();
-      if (user) {
-        const points = isWon ? calculatePoints(currentAttempt + 1, user.tier) : 0;
-        await setDoc(doc(db, 'users', user.id), {
-          points: user.points + points,
-          gamesPlayed: user.gamesPlayed + 1,
-          lastPlayed: new Date(),
-        }, { merge: true });
-      }
+    if (guess.length !== 5) {
+      set({ error: 'Guess must be 5 letters' });
+      return;
     }
+
+    if (guesses.length >= 6) {
+      set({ error: 'No more attempts allowed' });
+      return;
+    }
+
+    const newGuesses = [...guesses, guess];
+    set({ guesses: newGuesses, currentGuess: '' });
+
+    if (guess === word) {
+      // Calcular puntos
+      const remainingAttempts = 6 - newGuesses.length;
+      const streakBonus = Math.floor(POINTS_CONFIG.BASE_POINTS * (user.currentStreak * POINTS_CONFIG.STREAK_MULTIPLIER));
+      const attemptsBonus = remainingAttempts * POINTS_CONFIG.ATTEMPTS_MULTIPLIER;
+      const totalPoints = POINTS_CONFIG.BASE_POINTS + streakBonus + attemptsBonus;
+
+      // Actualizar estadísticas del usuario
+      const userRef = doc(db, 'users', user.id);
+      await updateDoc(userRef, {
+        gamesPlayed: user.gamesPlayed + 1,
+        gamesWon: user.gamesWon + 1,
+        currentStreak: user.currentStreak + 1,
+        bestStreak: Math.max(user.currentStreak + 1, user.bestStreak),
+        totalPoints: user.totalPoints + totalPoints,
+      });
+
+      set({ gameStatus: 'won' });
+    } else if (newGuesses.length === 6) {
+      // Actualizar estadísticas del usuario para juego perdido
+      const userRef = doc(db, 'users', user.id);
+      await updateDoc(userRef, {
+        gamesPlayed: user.gamesPlayed + 1,
+        currentStreak: 0,
+      });
+
+      set({ gameStatus: 'lost' });
+    }
+  },
+
+  setCurrentGuess: (guess: string) => {
+    set({ currentGuess: guess.toUpperCase() });
   },
 
   resetGame: () => {
     set({
-      gameState: null,
+      word: null,
+      guesses: [],
+      currentGuess: '',
+      gameStatus: 'playing',
       error: null,
     });
   },

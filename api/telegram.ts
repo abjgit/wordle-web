@@ -97,7 +97,7 @@ const gameKeyboard = {
   inline_keyboard: [[{
     text: "🎮 Play Wordle",
     web_app: {
-      url: `${APP_CONFIG.url}/game`
+      url: APP_CONFIG.url
     }
   }]]
 };
@@ -107,7 +107,7 @@ const helpKeyboard = {
     [{
       text: "🎮 Play Now",
       web_app: {
-        url: `${APP_CONFIG.url}/game`
+        url: APP_CONFIG.url
       }
     }],
     [{

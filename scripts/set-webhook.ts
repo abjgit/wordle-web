@@ -1,12 +1,20 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import { APP_CONFIG } from '../src/config';
+
+dotenv.config();
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 
 if (!BOT_TOKEN) {
   console.error('❌ BOT_TOKEN not found in environment variables');
   process.exit(1);
+}
+
+interface TelegramResponse {
+  ok: boolean;
+  description?: string;
+  result?: any;
 }
 
 async function setWebhook() {
@@ -31,7 +39,7 @@ async function setWebhook() {
       }
     );
 
-    const data = await response.json();
+    const data = await response.json() as TelegramResponse;
 
     if (data.ok) {
       console.log('✅ Webhook set successfully!');
@@ -44,7 +52,7 @@ async function setWebhook() {
     const infoResponse = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo`
     );
-    const infoData = await infoResponse.json();
+    const infoData = await infoResponse.json() as TelegramResponse;
     console.log('\n📊 Webhook Info:', JSON.stringify(infoData, null, 2));
 
   } catch (error) {

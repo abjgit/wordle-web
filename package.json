@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "setup-bot": "node scripts/setup-bot.js",
     "build:scripts": "tsc -p scripts/tsconfig.json",
-    "set-webhook": "npm run build:scripts && node scripts/dist/set-webhook.js"
+    "set-webhook": "npm run build:scripts && node --experimental-specifier-resolution=node scripts/dist/set-webhook.js"
   },
   "dependencies": {
     "@thirdweb-dev/react": "^4.9.4",

@@ -8,11 +8,13 @@
   "cleanUrls": true,
   "functions": {
     "api/**/*.ts": {
-      "runtime": "@vercel/node@3.0.0"
+      "runtime": "@vercel/node@3.0.0",
+      "memory": 1024,
+      "maxDuration": 10
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/api/(.*)", "destination": "/api/$1.ts" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

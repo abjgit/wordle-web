@@ -10,7 +10,7 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "setup-bot": "node scripts/setup-bot.js",
-    "set-webhook": "ts-node --esm scripts/set-webhook.ts"
+    "set-webhook": "NODE_OPTIONS=\"--loader ts-node/esm\" node --experimental-specifier-resolution=node scripts/set-webhook.ts"
   },
   "dependencies": {
     "@thirdweb-dev/react": "^4.9.4",

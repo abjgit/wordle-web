@@ -1,5 +1,8 @@
-require('dotenv').config();
-const { APP_CONFIG } = require('../src/config');
+import dotenv from 'dotenv';
+import { APP_CONFIG } from '../src/config.js';
+import fetch from 'node-fetch';
+
+dotenv.config();
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 

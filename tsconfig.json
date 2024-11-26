@@ -23,8 +23,7 @@
       "react",
       "react-dom",
       "node",
-      "vite/client",
-      "@vercel/node"
+      "vite/client"
     ],
     "typeRoots": [
       "./node_modules/@types",
@@ -36,6 +35,6 @@
     "forceConsistentCasingInFileNames": true,
     "jsxImportSource": "react"
   },
-  "include": ["src/**/*", "src/**/*.ts", "src/**/*.tsx", "src/types/**/*.d.ts", "api"],
+  "include": ["src/**/*", "src/**/*.ts", "src/**/*.tsx", "src/types/**/*.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

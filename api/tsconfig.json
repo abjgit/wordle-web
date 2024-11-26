@@ -14,7 +14,12 @@
     "paths": {
       "@/*": ["../src/*"]
     },
-    "types": ["@vercel/node", "node"]
+    "outDir": "./dist",
+    "rootDir": ".",
+    "typeRoots": [
+      "../node_modules/@types",
+      "../node_modules/@vercel/node"
+    ]
   },
   "include": ["./**/*.ts"],
   "exclude": ["node_modules"]

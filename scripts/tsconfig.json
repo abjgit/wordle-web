@@ -4,6 +4,19 @@
     "module": "ES2020",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "allowJs": true
-  }
+    "allowJs": true,
+    "outDir": "./dist",
+    "rootDir": "..",
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "./**/*.js",
+    "../src/**/*.ts",
+    "../src/**/*.tsx"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }

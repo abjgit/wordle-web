@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
-import { APP_CONFIG } from './config.js';
+import { APP_CONFIG } from '../src/config';
 
 dotenv.config();
 

@@ -134,7 +134,7 @@ export default async function handler(
     
     // Handle callback queries (button clicks)
     if (update.callback_query) {
-      const { id, from, data } = update.callback_query;
+      const { id, data } = update.callback_query;
       const chatId = update.callback_query.message.chat.id;
 
       switch (data) {

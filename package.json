@@ -10,7 +10,8 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "setup-bot": "node scripts/setup-bot.js",
-    "set-webhook": "cross-env NODE_OPTIONS=--loader=ts-node/esm node --experimental-specifier-resolution=node scripts/set-webhook.ts"
+    "build:scripts": "tsc -p scripts/tsconfig.json",
+    "set-webhook": "npm run build:scripts && node scripts/dist/set-webhook.js"
   },
   "dependencies": {
     "@thirdweb-dev/react": "^4.9.4",

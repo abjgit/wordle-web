@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
-import { APP_CONFIG } from '../src/config';
+require('dotenv').config();
 import fetch from 'node-fetch';
-
-dotenv.config();
+import { APP_CONFIG } from '../src/config';
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 

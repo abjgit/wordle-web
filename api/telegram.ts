@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { APP_CONFIG } from '../src/config';
+import { APP_CONFIG } from '@/config';
 
 interface TelegramMessage {
   message_id: number;

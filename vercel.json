@@ -43,5 +43,10 @@
     "VITE_FIREBASE_STORAGE_BUCKET": "gs://wordle-web-de916.firebasestorage.app",
     "VITE_FIREBASE_MESSAGING_SENDER_ID": "248001399511",
     "VITE_FIREBASE_APP_ID": "1:248001399511:web:09a5e0c31d1ddce3edbe92"
+  },
+  "build": {
+    "env": {
+      "NODE_OPTIONS": "--experimental-modules --es-module-specifier-resolution=node"
+    }
   }
 }

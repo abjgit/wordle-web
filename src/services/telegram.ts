@@ -4,6 +4,7 @@ interface TelegramWebApp {
   close: () => void;
   setHeaderColor: (color: string) => void;
   setBackgroundColor: (color: string) => void;
+  isExpanded: boolean;
   MainButton: {
     text: string;
     show: () => void;
@@ -40,10 +41,15 @@ export const initializeTelegramWebApp = () => {
     webApp.setHeaderColor('#FFFFFF');
     webApp.setBackgroundColor('#F9FAFB');
 
-    // Expand the web app to full height
+    // Expand the web app to full height and ensure it's visible
+    webApp.expand();
+    
+    // Make sure the webapp is fully expanded
     setTimeout(() => {
-      webApp.expand();
-    }, 100);
+      if (webApp.isExpanded !== true) {
+        webApp.expand();
+      }
+    }, 1000);
 
     // Return the WebApp instance for further use
     return webApp;

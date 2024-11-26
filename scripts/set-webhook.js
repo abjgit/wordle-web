@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { APP_CONFIG } from '../src/config.js';
+import { APP_CONFIG } from '../src/config.ts';
 import fetch from 'node-fetch';
 
 dotenv.config();

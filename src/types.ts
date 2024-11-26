@@ -1,4 +1,4 @@
-export type LetterStatus = 'correct' | 'present' | 'absent' | 'unused';
+export type LetterStatus = 'unused' | 'absent' | 'present' | 'correct';
 
 export interface GameState {
   word: string;
@@ -7,20 +7,13 @@ export interface GameState {
   gameStatus: 'playing' | 'won' | 'lost';
   letterStatuses: Record<string, LetterStatus>;
   currentRow: number;
+  statuses: LetterStatus[][];
 }
 
-export interface User {
-  id: string;
-  address: string;
-  points: number;
+export interface UserStats {
   gamesPlayed: number;
   gamesWon: number;
   currentStreak: number;
   maxStreak: number;
-  lastPlayedAt: Date | null;
-  [key: string]: string | number | Date | null | undefined;
-}
-
-export interface KeyboardState {
-  [key: string]: LetterStatus;
+  lastPlayed: Date;
 }

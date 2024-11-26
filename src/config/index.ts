@@ -2,8 +2,8 @@ export const GAME_CONFIG = {
   MAX_ATTEMPTS: 6,
   WORD_LENGTH: 5,
   BASE_POINTS: 100,
-  STREAK_MULTIPLIER: 0.1,  // 10% extra por cada juego en racha
-  ATTEMPTS_MULTIPLIER: 20,  // 20 puntos extra por cada intento restante
+  STREAK_MULTIPLIER: 0.1,  // 10% bonus for each game in streak
+  ATTEMPTS_MULTIPLIER: 20,  // 20 points bonus for each remaining attempt
 } as const;
 
 export const FIREBASE_CONFIG = {
@@ -17,5 +17,5 @@ export const FIREBASE_CONFIG = {
 
 export const THIRDWEB_CONFIG = {
   activeChain: "avalanche",
-  clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
-};
+  clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID
+} as const;

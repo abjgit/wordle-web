@@ -1,4 +1,18 @@
 import { Buffer } from 'buffer';
 
-window.global = window;
-(window as any).Buffer = Buffer;
+// Polyfill global object
+if (typeof window !== 'undefined') {
+  window.global = window;
+  window.Buffer = Buffer;
+  
+  // Additional required globals for web3
+  const globals = {
+    process: {
+      env: {},
+      version: '',
+      nextTick: (fn: Function) => setTimeout(fn, 0)
+    }
+  };
+  
+  Object.assign(window, globals);
+}

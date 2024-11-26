@@ -16,32 +16,43 @@ export const GameBoard = () => {
   ];
 
   return (
-    <div className="grid grid-rows-6 gap-1">
-      {guessRows.map((guess, i) => (
-        <div key={i} className="grid grid-cols-5 gap-1">
-          {guess.split('').map((letter: string, j: number) => {
-            let status: LetterStatus = 'unused';
-            if (i < guesses.length && gameState.statuses[i]) {
-              status = gameState.statuses[i][j];
-            }
+    <div className="flex flex-col items-center justify-center gap-1.5 mb-6">
+      <div className="w-full max-w-[330px] mx-auto">
+        {guessRows.map((guess, i) => (
+          <div key={i} className="grid grid-cols-5 gap-1.5 justify-items-center mb-1.5">
+            {guess.split('').map((letter: string, j: number) => {
+              let status: LetterStatus = 'unused';
+              if (i < guesses.length && gameState.statuses[i]) {
+                status = gameState.statuses[i][j];
+              }
 
-            return (
-              <div
-                key={j}
-                className={`
-                  w-14 h-14 border-2 flex items-center justify-center text-2xl font-bold
-                  ${status === 'correct' ? 'bg-green-500 text-white border-green-600' :
-                    status === 'present' ? 'bg-yellow-500 text-white border-yellow-600' :
-                    status === 'absent' ? 'bg-gray-500 text-white border-gray-600' :
-                    'bg-white text-black border-gray-300'}
-                `}
-              >
-                {letter}
-              </div>
-            );
-          })}
-        </div>
-      ))}
+              const isCurrentGuess = i === guesses.length && letter !== ' ';
+              const isEmpty = letter === ' ';
+
+              return (
+                <div
+                  key={j}
+                  className={`
+                    w-[62px] h-[62px] 
+                    flex items-center justify-center 
+                    text-2xl font-bold uppercase
+                    border-2 rounded-md
+                    ${isEmpty ? 'border-gray-200' : 'border-gray-400'}
+                    ${isCurrentGuess ? 'border-gray-600 scale-105 animate-pop' : ''}
+                    ${status === 'correct' ? 'bg-correct text-white border-correct/80' :
+                      status === 'present' ? 'bg-present text-white border-present/80' :
+                      status === 'absent' ? 'bg-absent text-white border-absent/80' :
+                      'bg-white text-black'}
+                    transition-all duration-150
+                  `}
+                >
+                  {!isEmpty ? letter : ''}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

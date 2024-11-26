@@ -8,38 +8,40 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      buffer: 'buffer',
+      stream: 'stream-browserify',
+      util: 'util',
+      crypto: 'crypto-browserify',
     },
+  },
+  define: {
+    'process.env': {},
+    global: 'globalThis',
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
+    include: ['buffer', 'process'],
   },
   build: {
     outDir: 'dist',
-    sourcemap: false,
+    sourcemap: true,
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
+        drop_console: false, 
       },
     },
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'zustand'],
-          web3: ['@thirdweb-dev/react', '@thirdweb-dev/sdk', 'ethers'],
-          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-        },
-      },
-    },
-  },
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
-  },
-  define: {
-    'process.env': process.env,
-  },
-})
+          vendor: ['react', 'react-dom'],
+          web3: ['@thirdweb-dev/react', '@thirdweb-dev/chains'],
+        }
+      }
+    }
+  }
+});

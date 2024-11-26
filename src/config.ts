@@ -9,10 +9,10 @@ export const APP_CONFIG = {
   name: 'Wordle Web',
   description: 'A Web3-enabled Wordle game',
   domain: process.env.NODE_ENV === 'production' 
-    ? 'wordle-f398zs3g7-abjgits-projects.vercel.app'
+    ? 'wordle-web-nu.vercel.app'
     : 'localhost:5173',
   url: process.env.NODE_ENV === 'production'
-    ? 'https://wordle-f398zs3g7-abjgits-projects.vercel.app'
+    ? 'https://wordle-web-nu.vercel.app'
     : 'http://localhost:5173',
 };
 
@@ -28,7 +28,6 @@ export const FIREBASE_CONFIG = {
 
 // ThirdWeb configuration
 export const THIRDWEB_CONFIG = {
-  activeChain: "mumbai",
   clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
 };
 
@@ -49,8 +48,8 @@ export const TIERS = {
     requiredPoints: 1000,
   },
   ADVANCED: {
-    dailyAttempts: 10,
+    dailyAttempts: 7,
     pointsMultiplier: 2,
     requiredPoints: 5000,
-  },
+  }
 } as const;

@@ -8,6 +8,7 @@ interface GameState {
   gameStatus: 'playing' | 'won' | 'lost';
   letterStatuses: Record<string, LetterStatus>;
   currentRow: number;
+  statuses: LetterStatus[][];
 }
 
 interface GameStore {
@@ -18,60 +19,116 @@ interface GameStore {
   submitGuess: () => void;
 }
 
-const initialState: GameState = {
-  word: '',
+const WORDS = [
+  'WORLD', 'HELLO', 'GAMES', 'HOUSE', 'TABLE',
+  'CHAIR', 'PLATE', 'PHONE', 'WATER', 'LIGHT',
+  'PAPER', 'MUSIC', 'CLOCK', 'BEACH', 'NIGHT',
+  'SPACE', 'EARTH', 'DREAM', 'BRAIN', 'SMILE'
+];
+
+const getRandomWord = () => WORDS[Math.floor(Math.random() * WORDS.length)];
+
+const createInitialState = (): GameState => ({
+  word: getRandomWord(),
   guesses: [],
   currentGuess: '',
   gameStatus: 'playing',
   letterStatuses: {},
   currentRow: 0,
+  statuses: []
+});
+
+const checkGuess = (guess: string, word: string): LetterStatus[] => {
+  const result: LetterStatus[] = Array(5).fill('absent');
+  const wordArray = word.split('');
+  const guessArray = guess.split('');
+
+  // Check for correct letters first
+  guessArray.forEach((letter, i) => {
+    if (letter === wordArray[i]) {
+      result[i] = 'correct';
+      wordArray[i] = '#'; // Mark as used
+    }
+  });
+
+  // Check for present letters
+  guessArray.forEach((letter, i) => {
+    if (result[i] === 'correct') return;
+    
+    const index = wordArray.indexOf(letter);
+    if (index !== -1) {
+      result[i] = 'present';
+      wordArray[index] = '#'; // Mark as used
+    }
+  });
+
+  return result;
 };
 
-export const useGameStore = create<GameStore>((set) => ({
-  gameState: initialState,
-  
+export const useGameStore = create<GameStore>((set, get) => ({
+  gameState: createInitialState(),
+
   initializeGame: () => {
-    set({ gameState: initialState });
+    set({ gameState: createInitialState() });
   },
 
   addLetter: (letter: string) => {
-    set((state) => {
-      if (state.gameState.currentGuess.length >= 5) return state;
-      return {
+    const { gameState } = get();
+    if (gameState.currentGuess.length < 5 && gameState.gameStatus === 'playing') {
+      set({
         gameState: {
-          ...state.gameState,
-          currentGuess: state.gameState.currentGuess + letter,
-        },
-      };
-    });
+          ...gameState,
+          currentGuess: gameState.currentGuess + letter
+        }
+      });
+    }
   },
 
   removeLetter: () => {
-    set((state) => ({
-      gameState: {
-        ...state.gameState,
-        currentGuess: state.gameState.currentGuess.slice(0, -1),
-      },
-    }));
+    const { gameState } = get();
+    if (gameState.currentGuess.length > 0 && gameState.gameStatus === 'playing') {
+      set({
+        gameState: {
+          ...gameState,
+          currentGuess: gameState.currentGuess.slice(0, -1)
+        }
+      });
+    }
   },
 
   submitGuess: () => {
-    set((state) => {
-      if (state.gameState.currentGuess.length !== 5) return state;
+    const { gameState } = get();
+    if (gameState.currentGuess.length !== 5 || gameState.gameStatus !== 'playing') return;
 
-      const newGuesses = [...state.gameState.guesses, state.gameState.currentGuess];
-      const won = state.gameState.currentGuess === state.gameState.word;
-      const lost = newGuesses.length >= 6;
+    const newStatuses = [...gameState.statuses];
+    const currentStatus = checkGuess(gameState.currentGuess, gameState.word);
+    newStatuses.push(currentStatus);
 
-      return {
-        gameState: {
-          ...state.gameState,
-          guesses: newGuesses,
-          currentGuess: '',
-          gameStatus: won ? 'won' : lost ? 'lost' : 'playing',
-          currentRow: state.gameState.currentRow + 1,
-        },
-      };
+    const newLetterStatuses = { ...gameState.letterStatuses };
+    gameState.currentGuess.split('').forEach((letter, i) => {
+      const currentLetterStatus = currentStatus[i];
+      const existingStatus = newLetterStatuses[letter];
+      
+      if (!existingStatus || 
+          (existingStatus === 'absent' && currentLetterStatus !== 'absent') ||
+          (existingStatus === 'present' && currentLetterStatus === 'correct')) {
+        newLetterStatuses[letter] = currentLetterStatus;
+      }
     });
-  },
+
+    const isWon = gameState.currentGuess === gameState.word;
+    const isLost = gameState.guesses.length === 5 && !isWon;
+
+    set({
+      gameState: {
+        ...gameState,
+        guesses: [...gameState.guesses, gameState.currentGuess],
+        currentGuess: '',
+        currentRow: gameState.currentRow + 1,
+        gameStatus: isWon ? 'won' : isLost ? 'lost' : 'playing',
+        letterStatuses: newLetterStatuses,
+        statuses: newStatuses
+      }
+    });
+  }
 }));

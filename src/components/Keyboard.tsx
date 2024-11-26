@@ -2,63 +2,57 @@ import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { LetterStatus } from '@/types';
 
+interface KeyboardProps {
+  onKeyPress: (key: string) => void;
+}
+
 const KEYBOARD_ROWS = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
   ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-  ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE']
+  ['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'],
 ];
 
-interface KeyboardProps {
-  onKeyPress?: (key: string) => void;
-}
+const getKeyClass = (status: LetterStatus | undefined): string => {
+  switch (status) {
+    case 'correct':
+      return 'bg-correct text-white hover:bg-correct/90';
+    case 'present':
+      return 'bg-present text-white hover:bg-present/90';
+    case 'absent':
+      return 'bg-absent text-white hover:bg-absent/90';
+    default:
+      return 'bg-key-bg text-black hover:bg-key-bg/80';
+  }
+};
 
-export const Keyboard: React.FC<KeyboardProps> = () => {
-  const { gameState, makeGuess, setCurrentGuess } = useGameStore();
-
-  const getKeyStatus = (key: string): LetterStatus => {
-    const { statuses, guesses } = gameState;
-    const flatStatuses = statuses.flat();
-    const flatGuesses = guesses.join('').toUpperCase();
-    const keyIndex = flatGuesses.lastIndexOf(key);
-    
-    if (keyIndex === -1) return 'unused';
-    return flatStatuses[keyIndex];
-  };
-
-  const handleKeyClick = (key: string) => {
-    if (gameState.isFinished) return;
-
-    if (key === 'BACKSPACE') {
-      setCurrentGuess(gameState.currentGuess.slice(0, -1));
-    } else if (key === 'ENTER') {
-      if (gameState.currentGuess.length === 5) {
-        makeGuess(gameState.currentGuess);
-      }
-    } else if (gameState.currentGuess.length < 5) {
-      setCurrentGuess(gameState.currentGuess + key);
-    }
-  };
+export const Keyboard: React.FC<KeyboardProps> = ({ onKeyPress }) => {
+  const { gameState } = useGameStore();
 
   return (
-    <div className="flex flex-col items-center gap-2 mt-8">
+    <div className="flex flex-col gap-2 px-1 select-none max-w-[500px] mx-auto">
       {KEYBOARD_ROWS.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex gap-1.5">
+        <div key={rowIndex} className="flex justify-center gap-1">
           {row.map((key) => {
-            const status = getKeyStatus(key);
+            const status = key.length === 1 ? gameState.letterStatuses[key] : undefined;
+            const isSpecialKey = key.length > 1;
+            
             return (
               <button
                 key={key}
-                onClick={() => handleKeyClick(key)}
+                onClick={() => onKeyPress(key)}
                 className={`
-                  font-bold text-sm sm:text-base transition-colors duration-150 
-                  ${status === 'correct' ? 'bg-correct text-white' :
-                    status === 'present' ? 'bg-present text-white' :
-                    status === 'absent' ? 'bg-absent text-white' :
-                    'bg-key-bg text-gray-900 hover:bg-gray-300'}
-                  ${key === 'ENTER' || key === 'BACKSPACE' ? 'min-w-[65px] px-2' : 'min-w-[40px]'}
+                  ${isSpecialKey ? 'px-3 min-w-[4rem]' : 'w-10'} 
+                  h-14
+                  rounded-md
+                  font-bold 
+                  text-sm 
+                  uppercase
+                  transition-colors
+                  active:scale-95
+                  ${isSpecialKey ? 'bg-key-bg hover:bg-key-bg/80' : getKeyClass(status)}
                 `}
               >
-                {key === 'BACKSPACE' ? '⌫' : key}
+                {key === 'Backspace' ? '←' : key}
               </button>
             );
           })}

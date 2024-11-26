@@ -2,25 +2,24 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2020",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "allowJs": true,
     "outDir": "./dist",
-    "rootDir": "..",
+    "rootDir": ".",
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "baseUrl": "..",
+    "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*", "src/*"]
+      "@/*": ["../src/*"]
     }
   },
   "include": [
-    "./**/*.ts",
-    "../src/**/*.ts",
-    "../src/**/*.tsx"
+    "./**/*.ts"
   ],
   "exclude": [
     "dist",
-    "node_modules"
+    "node_modules",
+    "../src/**/*"
   ]
 }

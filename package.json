@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run clean && tsc && vite build",
-    "clean": "rimraf .vercel/output && rimraf dist",
+    "build": "npm run clean && tsc && tsc -p api/tsconfig.json && vite build",
+    "clean": "rimraf .vercel/output && rimraf dist && rimraf api/dist",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "setup-bot": "node scripts/setup-bot.js",

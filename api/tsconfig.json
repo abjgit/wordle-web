@@ -10,17 +10,20 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["../src/*"]
-    },
+    "baseUrl": "..",
+    "rootDir": "..",
     "outDir": "./dist",
-    "rootDir": ".",
     "typeRoots": [
       "../node_modules/@types",
       "../node_modules/@vercel/node"
-    ]
+    ],
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["./**/*.ts"],
+  "include": [
+    "./**/*.ts",
+    "../src/config.ts"
+  ],
   "exclude": ["node_modules"]
 }

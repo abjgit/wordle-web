@@ -19,22 +19,9 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": [
-      "react",
-      "react-dom",
-      "node",
-      "vite/client"
-    ],
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
-    ],
-    "allowJs": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsxImportSource": "react"
+    "types": ["node", "react", "react-dom", "vite/client"],
+    "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["src/**/*", "src/**/*.ts", "src/**/*.tsx", "src/types/**/*.d.ts"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

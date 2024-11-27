@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && tsc -p api/tsconfig.json && vite build",
+    "build": "tsc -p tsconfig.node.json && vite build",
     "clean": "rimraf dist",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

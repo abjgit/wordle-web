@@ -8,15 +8,11 @@
   "cleanUrls": true,
   "functions": {
     "api/**/*": {
-      "runtime": "@vercel/node@3.0.0",
+      "runtime": "@vercel/node@18.x",
       "memory": 1024,
       "maxDuration": 10
     }
   },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -36,9 +32,6 @@
       ]
     }
   ],
-  "build": {
-    "env": {
-      "NODE_OPTIONS": "--experimental-modules --es-module-specifier-resolution=node"
-    }
-  }
+  "regions": ["cdg1"],
+  "version": 2
 }
